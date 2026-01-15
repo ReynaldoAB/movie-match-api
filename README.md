@@ -1,6 +1,6 @@
 # 🎬 Movie Match API
 
-API REST para gestionar y recomendar películas, construida con Express.js.
+API REST para gestionar y recomendar películas, construida con Express.js y enriquecida con IA.
 
 ## 🚀 Características
 
@@ -11,12 +11,14 @@ API REST para gestionar y recomendar películas, construida con Express.js.
 - ✅ Ordenamiento por cualquier campo
 - ✅ Paginación de resultados
 - ✅ Estadísticas de la colección
+- ✅ **Descubrimiento con IA** - Películas aleatorias enriquecidas con trivia, quotes y datos curiosos
 - ✅ Rutas organizadas con Express Router
 
 ## 📋 Requisitos
 
 - Node.js 14 o superior
 - npm o yarn
+- Cuenta en [OpenRouter](https://openrouter.ai/) (para funcionalidad de IA)
 
 ## 🔧 Instalación
 
@@ -29,6 +31,11 @@ cd movie-match-api
 
 # Instalar dependencias
 npm install
+
+# Configurar variables de entorno
+# Crear archivo .env con:
+OPENROUTER_API_KEY=tu_api_key_aqui
+PORT=3000
 
 # Iniciar el servidor
 npm start
@@ -103,6 +110,21 @@ GET /movies/:id
 GET /movies/random
 ```
 
+#### Descubrir películas (con IA) 🤖✨
+```
+GET /movies/discover
+GET /movies/discover?count=5
+```
+
+**Nuevo endpoint que devuelve películas aleatorias enriquecidas con:**
+- **Anécdota** del rodaje
+- **Trivia** interesante sobre la película
+- **Quote** famosa de la película
+- **Dato curioso** de la producción
+
+**Query Parameters:**
+- `count` - Número de películas a devolver (1-20, por defecto: 10)
+
 #### Estadísticas de la colección
 ```
 GET /movies/stats
@@ -119,16 +141,25 @@ Devuelve información estadística sobre todas las películas:
 
 ```
 movie-match-api/
+├── controllers/
+│   └── movieController.js    # Controladores de rutas
 ├── data/
-│   └── movies.js       # Datos de películas
+│   └── movies.js             # Datos de películas
 ├── routes/
-│   └── movies.js       # Rutas de películas
-├── index.js            # Archivo principal
+│   └── movies.js             # Rutas de películas
+├── services/
+│   ├── aiService.js          # Servicio de IA (OpenRouter)
+│   └── movieService.js       # Lógica de negocio de películas
+├── .env                      # Variables de entorno (no incluir en git)
+├── .gitignore               
+├── index.js                  # Archivo principal
 ├── package.json
 └── README.md
 ```
 
 ## 🎯 Ejemplos de Uso
+
+### Endpoints básicos
 
 ```bash
 # Todas las películas
@@ -165,10 +196,25 @@ curl http://localhost:3000/movies/random
 curl http://localhost:3000/movies/stats
 ```
 
+### Nuevo: Descubrimiento con IA 🤖
+
+```bash
+# 10 películas aleatorias con IA (por defecto)
+curl http://localhost:3000/movies/discover
+
+# 5 películas aleatorias con IA
+curl http://localhost:3000/movies/discover?count=5
+
+# 3 películas aleatorias con IA
+curl http://localhost:3000/movies/discover?count=3
+```
+
 ## 🛠️ Tecnologías
 
 - **Express.js** - Framework web
 - **Node.js** - Runtime de JavaScript
+- **OpenRouter API** - Integración con modelos de IA (Llama 3.3)
+- **dotenv** - Gestión de variables de entorno
 - **ES Modules** - Módulos JavaScript modernos
 
 ## 📝 Respuestas de la API
@@ -207,6 +253,32 @@ curl http://localhost:3000/movies/stats
 }
 ```
 
+### Descubrir películas con IA 🤖
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "title": "The Shawshank Redemption",
+      "year": 1994,
+      "genre": "Drama",
+      "director": "Frank Darabont",
+      "rating": 9.3,
+      "ai_enriched": {
+        "title": "The Shawshank Redemption",
+        "anecdote": "Durante el rodaje, Tim Robbins tuvo que gatear por un túnel real lleno de lodo...",
+        "trivia": "La película no fue un éxito en taquilla, pero se convirtió en un clásico...",
+        "quote": "Get busy living, or get busy dying",
+        "funFact": "El muro que Andy atraviesa fue construido específicamente para la película..."
+      }
+    }
+  ],
+  "count": 1,
+  "requested": 1
+}
+```
+
 ### Estadísticas
 ```json
 {
@@ -240,6 +312,17 @@ curl http://localhost:3000/movies/stats
   "error": "Película no encontrada"
 }
 ```
+
+## 🔑 Configuración de OpenRouter
+
+1. Crear cuenta en [OpenRouter](https://openrouter.ai/)
+2. Generar una API Key
+3. Agregar al archivo `.env`:
+   ```env
+   OPENROUTER_API_KEY=sk-or-v1-tu-key-aqui
+   PORT=3000
+   ```
+4. **Importante**: Agregar `.env` al `.gitignore` para no exponer tu API key
 
 ## 🤝 Contribuir
 
