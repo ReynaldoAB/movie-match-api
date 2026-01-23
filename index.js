@@ -1,20 +1,25 @@
 import 'dotenv/config';
 import express from 'express';
-import moviesRouter from './routes/movies.js';
+import moviesRouter from './src/routes/movies.js';
 import cors from 'cors';
 
 // Importa tus middlewares custom
-import { logger } from './middlewares/logger.js';
-import { errorHandler } from './middlewares/errorHandler.js';
-import { notFound } from './middlewares/notFound.js';
+import { logger } from './src/middlewares/logger.js';
+import { errorHandler } from './src/middlewares/errorHandler.js';
+import { notFound } from './src/middlewares/notFound.js';
 
 // Agregar imports al inicio de index.js
 import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
 
+// const prisma = new PrismaClient({
+//   log: ['query', 'error', 'warn'],
+// });
+// export default prisma;
+
 // Cargar el archivo YAML
 // Tip: YAML.load() convierte YAML a objeto JavaScript
-const swaggerDoc = YAML.load('./docs/swagger.yaml');
+const swaggerDoc = YAML.load('./src/docs/swagger.yaml');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -34,6 +39,17 @@ app.get('/', (req, res) => {
      endpoints: {
        movies: '/movies'
       }
+  });
+});
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    success: true,
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV || 'development'
   });
 });
 

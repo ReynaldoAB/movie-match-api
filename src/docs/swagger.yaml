@@ -1,0 +1,263 @@
+# # docs/swagger.yaml
+# openapi: 3.0.0
+# info:
+#   title: Movie Match API
+#   version: 1.0.0
+#   description: API de películas con IA integrada
+
+# servers:
+#   - url: http://localhost:3000
+#     description: Desarrollo local
+#   - url: https://tu-app.onrender.com
+#     description: Producción
+
+# paths:
+#   /movies:
+#     get:
+#       summary: Obtener todas las películas
+#       description: Retorna lista de películas con filtros opcionales
+#       parameters:
+#         # Documenta el parámetro "genre"
+#         - name: genre
+#           in: query
+#           schema:
+#             type: string
+#           description: Filtrar por género
+#         # Documenta el parámetro "minRating"
+#         - name: ________
+#           in: query
+#           schema:
+#             type: ________
+#           description: Rating mínimo
+#       responses:
+#         '200':
+#           description: Lista de películas
+#           content:
+#             application/json:
+#               schema:
+#                 type: object
+#                 properties:
+#                   success:
+#                     type: boolean
+#                   data:
+#                     type: array
+#                   count:
+#                     type: integer
+
+#   /movies/{id}:
+#     get:
+#       summary: Obtener película por ID
+#       parameters:
+#         # Documenta el parámetro de ruta "id"
+#         - name: ____
+#           in: ____
+#           required: true
+#           schema:
+#             type: integer
+#       responses:
+#         '200':
+#           description: Película encontrada
+#         '404':
+#           description: Película no encontrada
+
+#   /movies/discover:
+#     get:
+#       summary: Descubrir películas con IA
+#       description: Retorna películas enriquecidas con anécdotas y datos curiosos
+#       responses:
+#         '200':
+#           description: Películas con contenido de IA
+#   /movies:
+#   post:
+#     summary: Crear nueva película
+#     requestBody:
+#       required: true
+#       content:
+#         application/json:
+#           schema:
+#             # Define las propiedades esperadas
+
+openapi: 3.0.0
+info:
+  title: Movie Match API
+  version: 1.0.0
+  description: API para gestionar películas y obtener recomendaciones con IA
+
+servers:
+  - url: http://localhost:3000
+    description: Servidor local
+
+paths:
+  /movies:
+    get:
+      summary: Obtener todas las películas
+      tags:
+        - Movies
+      responses:
+        '200':
+          description: Lista de películas
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Movie'
+                  count:
+                    type: integer
+    
+    post:
+      summary: Crear una nueva película
+      tags:
+        - Movies
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - year
+                - rating
+              properties:
+                title:
+                  type: string
+                  example: "Inception"
+                year:
+                  type: integer
+                  example: 2010
+                rating:
+                  type: number
+                  format: float
+                  example: 8.8
+                poster:
+                  type: string
+                  example: "https://example.com/inception.jpg"
+      responses:
+        '201':
+          description: Película creada exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Movie'
+        '400':
+          description: Error en los datos enviados
+
+  /movies/discover:
+    get:
+      summary: Descubrir películas aleatorias con análisis de IA
+      tags:
+        - Movies
+      parameters:
+        - in: query
+          name: count
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 20
+            default: 10
+          description: Cantidad de películas a obtener
+      responses:
+        '200':
+          description: Películas con análisis de IA
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Movie'
+                  count:
+                    type: integer
+                  requested:
+                    type: integer
+
+  /movies/{id}:
+    get:
+      summary: Obtener película por ID
+      tags:
+        - Movies
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID de la película
+      responses:
+        '200':
+          description: Película encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Movie'
+        '404':
+          description: Película no encontrada
+
+components:
+  schemas:
+    Movie:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: "The Shawshank Redemption"
+        year:
+          type: integer
+          example: 1994
+        rating:
+          type: number
+          format: float
+          example: 9.3
+        poster:
+          type: string
+          example: "https://example.com/poster.jpg"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+/movies/filter:
+  get:
+    summary: Filtrar películas por rating mínimo
+    tags:
+      - Movies
+    parameters:
+      - in: query
+        name: minRating
+        required: true
+        schema:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 10
+        description: Rating mínimo (0-10)
+    responses:
+      '200':
+        description: Películas filtradas por rating
