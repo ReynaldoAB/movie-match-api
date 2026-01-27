@@ -1,11 +1,19 @@
-import { Router } from 'express';
-import * as movieController from '../controllers/movieController.js';
+import express from 'express';
+import { 
+  getAllMovies, 
+  getMovieById, 
+  createMovie,
+  filterByRating,
+  discoverMovies
+} from '../controllers/movieController.js';
 
-const router = Router();
-router.get('/', movieController.getMovies);
-router.get('/discover', movieController.discoverMovies);  // ← Agregar ANTES de /:id
-router.get('/filter', movieController.getMoviesByRating); // ✅ NUEVO
-router.get('/:id', movieController.getMovieById);
-router.post('/', movieController.createMovie); // ✅ Nueva ruta
+const router = express.Router();
+
+router.get('/filter', filterByRating);
+router.get('/discover', discoverMovies);
+
+router.get('/', getAllMovies);
+router.get('/:id', getMovieById);
+router.post('/', createMovie);
 
 export default router;

@@ -1,25 +1,3 @@
-// import { movies } from '../data/movies.js';
-
-// export function getAllMovies(filters = {}) {
-//   let result = [...movies];
-//   if (filters.genre) {
-//     result = result.filter(m => m.genre.toLowerCase() === filters.genre.toLowerCase());
-//   }
-//   if (filters.minRating) {
-//     result = result.filter(m => m.rating >= parseFloat(filters.minRating));
-//   }
-//   return result;
-// }
-
-// export function getMovieById(id) {
-//   return movies.find(m => m.id === parseInt(id));
-// }
-
-// export function getRandomMovies(count = 10) {
-//   const shuffled = [...movies].sort(() => 0.5 - Math.random());
-//   return shuffled.slice(0, Math.min(count, movies.length));
-// }
-
 import prisma from '../lib/prisma.js';
 
 // GET all movies
@@ -82,4 +60,24 @@ export async function deleteMovie(id) {
   return await prisma.movie.delete({
     where: { id: parseInt(id) }
   });
+}
+
+// Agregar esta función
+export async function getRandomMoviesWithAI(count = 10) {
+  const totalMovies = await prisma.movie.count();
+  
+  if (totalMovies === 0) {
+    return [];
+  }
+
+  const validCount = Math.min(count, totalMovies);
+  
+  // Obtener películas aleatorias usando ORDER BY RANDOM()
+  const randomMovies = await prisma.$queryRaw`
+    SELECT * FROM "Movie" 
+    ORDER BY RANDOM() 
+    LIMIT ${validCount}
+  `;
+
+  return randomMovies;
 }
