@@ -1,19 +1,16 @@
 import express from 'express';
-import { 
-  getAllMovies, 
-  getMovieById, 
-  createMovie,
-  filterByRating,
-  discoverMovies
-} from '../controllers/movieController.js';
+import * as movieController from '../controllers/movieController.js';
 
 const router = express.Router();
 
-router.get('/filter', filterByRating);
-router.get('/discover', discoverMovies);
+router.get('/filter', movieController.filterByRating);
+router.get('/discover', movieController.discoverMovies);
+router.get('/genres', movieController.getGenres);
 
-router.get('/', getAllMovies);
-router.get('/:id', getMovieById);
-router.post('/', createMovie);
+router.get('/', movieController.getAllMovies);
+router.get('/:id', movieController.getMovieById);
+router.post('/', movieController.createMovie);
+
+
 
 export default router;

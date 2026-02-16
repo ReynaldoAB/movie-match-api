@@ -1,39 +1,8 @@
 import prisma from '../lib/prisma.js';
 
 // GET all movies
-// export async function getAllMovies() {
-//   return await prisma.movie.findMany({
-//     orderBy: { createdAt: 'desc' }
-//   });
-// }
-
-export function getGenres() {
-  // Devuelve los valores del enum
-  return ['ACTION', 'COMEDY', 'DRAMA', 'HORROR', 'SCIFI', 'THRILLER'];
-}
-
-export async function getAllMovies(filters = {}) {
-  const where = {};
-
-  // Filtro por género
-  if (filters.genre) {
-    where.genre = filters.genre;
-  }
-
-  // Filtro por año exacto
-  if (filters.year) {
-    where.year = parseInt(filters.year);
-  }
-
-  // Filtro por rating mínimo
-  if (filters.minRating) {
-    where.rating = {
-      gte: parseFloat(filters.minRating)
-    };
-  }
-
+export async function getAllMovies() {
   return await prisma.movie.findMany({
-    where,
     orderBy: { createdAt: 'desc' }
   });
 }
@@ -68,7 +37,6 @@ export async function createMovie(data) {
       title: data.title,
       year: parseInt(data.year),
       rating: parseFloat(data.rating),
-      genre: data.genre, // NUEVO: Aseguramos que el género se guarde correctamente
       poster: data.poster || null
     }
   });

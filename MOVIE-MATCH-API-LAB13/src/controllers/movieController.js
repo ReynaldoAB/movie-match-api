@@ -1,5 +1,4 @@
 import { 
-  getGenres as getGenresService,
   getAllMovies as getAllMoviesService, 
   getMovieById as getMovieByIdService,
   createMovie as createMovieService,
@@ -17,8 +16,6 @@ const sendSuccess = (res, data) => {
 const sendError = (res, status, message) => {
   res.status(status).json({ success: false, error: message });
 };
-
-const VALID_GENRES = ['ACTION', 'COMEDY', 'DRAMA', 'HORROR', 'SCIFI', 'THRILLER'];
 
 export async function discoverMovies(req, res) {
   try {
@@ -39,52 +36,9 @@ export async function discoverMovies(req, res) {
   }
 }
 
-export function getGenres(req, res) {
-  const genres = getGenresService();
-  res.json({ success: true, data: genres });
-}
-
-// export async function getAllMovies(req, res) {
-//   try {
-//     const movies = await getAllMoviesService(req.query);
-//     sendSuccess(res, movies);
-//   } catch (error) {
-//     sendError(res, 500, error.message);
-//   }
-// }
-
 export async function getAllMovies(req, res) {
   try {
-    const filters = { ...req.query };
-
-    if (filters.genre) {
-      filters.genre = String(filters.genre).trim().toUpperCase();
-      if (!VALID_GENRES.includes(filters.genre)) {
-        return sendError(
-          res,
-          400,
-          `genre inválido. Valores permitidos: ${VALID_GENRES.join(', ')}`
-        );
-      }
-    }
-
-    if (filters.year) {
-      const year = Number.parseInt(filters.year, 10);
-      if (Number.isNaN(year)) {
-        return sendError(res, 400, 'year debe ser un número entero');
-      }
-      filters.year = String(year);
-    }
-
-    if (filters.minRating) {
-      const minRating = Number.parseFloat(filters.minRating);
-      if (Number.isNaN(minRating) || minRating < 0 || minRating > 10) {
-        return sendError(res, 400, 'minRating debe ser un número entre 0 y 10');
-      }
-      filters.minRating = String(minRating);
-    }
-
-    const movies = await getAllMoviesService(filters);
+    const movies = await getAllMoviesService(req.query);
     sendSuccess(res, movies);
   } catch (error) {
     sendError(res, 500, error.message);

@@ -10,17 +10,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  //url      = env("DATABASE_URL")
-}
-
-// NUEVO: Enum con géneros válidos
-enum Genre {
-  ACTION
-  COMEDY
-  DRAMA
-  HORROR
-  SCIFI
-  THRILLER
+  // url      = env("DATABASE_URL")
 }
 
 model Movie {
@@ -29,7 +19,6 @@ model Movie {
   year      Int
   rating    Float
   poster    String?
-  genre     Genre // NUEVO: Campo de género usando el enum
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

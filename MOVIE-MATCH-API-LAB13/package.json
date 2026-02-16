@@ -22,7 +22,6 @@
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
-    "@types/node": "^25.2.3",
     "dotenv": "^17.2.3",
     "nodemon": "^3.1.11"
   }

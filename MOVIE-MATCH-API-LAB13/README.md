@@ -57,9 +57,6 @@ npx prisma generate
 # Aplicar el schema a la base de datos
 npx prisma db push
 
-# (Opcional) Poblar datos iniciales
-node prisma/seed.js
-
 # (Opcional) Ver base de datos en navegador
 npx prisma studio
 ```
@@ -82,10 +79,9 @@ El servidor estará corriendo en:
 
 ```
 movie-match-api/
-├── prisma.config.ts          # Configuración de Prisma 7 (datasource.url)
 ├── prisma/
 │   ├── schema.prisma          # Modelo de datos
-│   └── seed.js                # Seed de datos de películas
+│   └── prisma.config.ts       # Configuración de Prisma 7
 ├── src/
 │   ├── lib/
 │   │   └── prisma.js          # Cliente de Prisma con adapter
@@ -153,18 +149,6 @@ Estado del servidor y métricas.
 GET /movies
 ```
 
-**Query Parameters opcionales:**
-- `genre` - Género (`ACTION`, `COMEDY`, `DRAMA`, `HORROR`, `SCIFI`, `THRILLER`)
-- `year` - Año exacto (entero)
-- `minRating` - Rating mínimo (0-10)
-
-**Ejemplos:**
-```bash
-curl "http://localhost:3000/movies?genre=ACTION"
-curl "http://localhost:3000/movies?genre=ACTION&minRating=8"
-curl "http://localhost:3000/movies?year=2008"
-```
-
 **Respuesta:**
 ```json
 {
@@ -181,24 +165,6 @@ curl "http://localhost:3000/movies?year=2008"
     }
   ],
   "count": 1
-}
-```
-
-**Validaciones (400):**
-- `genre` fuera del enum permitido
-- `year` no entero
-- `minRating` fuera de rango o no numérico
-
-#### Listar géneros disponibles
-```http
-GET /movies/genres
-```
-
-**Respuesta:**
-```json
-{
-  "success": true,
-  "data": ["ACTION", "COMEDY", "DRAMA", "HORROR", "SCIFI", "THRILLER"]
 }
 ```
 
@@ -323,7 +289,6 @@ Content-Type: application/json
   "title": "Inception",
   "year": 2010,
   "rating": 8.8,
-  "genre": "SCIFI",
   "poster": "https://example.com/inception.jpg"
 }
 ```
@@ -332,7 +297,6 @@ Content-Type: application/json
 - `title` (string, requerido)
 - `year` (integer, requerido)
 - `rating` (float, requerido, 0-10)
-- `genre` (enum, requerido: `ACTION`, `COMEDY`, `DRAMA`, `HORROR`, `SCIFI`, `THRILLER`)
 - `poster` (string, opcional)
 
 **Respuesta:**
@@ -369,7 +333,7 @@ http://localhost:3000/docs
 
 ### Backend
 - **Node.js** v24+ - Runtime de JavaScript
-- **Express.js** 5.x - Framework web minimalista
+- **Express.js** 4.x - Framework web minimalista
 - **Prisma 7** - ORM moderno con TypeScript
 
 ### Base de Datos
@@ -395,16 +359,14 @@ http://localhost:3000/docs
     "@prisma/adapter-pg": "^7.3.0",
     "@prisma/client": "^7.3.0",
     "cors": "^2.8.5",
-    "express": "^5.2.1",
-    "pg": "^8.17.2",
-    "prisma": "^7.3.0",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "pg": "^8.13.1",
     "swagger-ui-express": "^5.0.1",
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
-    "@types/node": "^25.2.3",
-    "dotenv": "^17.2.3",
-    "nodemon": "^3.1.11"
+    "prisma": "^7.3.0"
   }
 }
 ```
@@ -539,7 +501,7 @@ Este proyecto usa **Prisma 7** con cambios arquitectónicos importantes:
    }
    ```
 
-2. **Configuración en `prisma.config.ts` (raíz del proyecto)**
+2. **Configuración en `prisma.config.ts`**
    ```typescript
    export default defineConfig({
      datasource: {
@@ -566,9 +528,6 @@ npx prisma generate
 
 # Aplicar cambios al schema
 npx prisma db push
-
-# Poblar datos de ejemplo
-node prisma/seed.js
 
 # Ver base de datos
 npx prisma studio
