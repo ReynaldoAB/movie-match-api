@@ -3,6 +3,7 @@ import {
   getAllMovies as getAllMoviesService, 
   getMovieById as getMovieByIdService,
   createMovie as createMovieService,
+  deleteMovie as deleteMovieService,
   getRandomMoviesWithAI,
   getMoviesByMinRating
 } from '../services/movieService.js';
@@ -85,7 +86,12 @@ export async function getAllMovies(req, res) {
     }
 
     const movies = await getAllMoviesService(filters);
-    sendSuccess(res, movies);
+    const moviesWithReviewCount = movies.map((movie) => ({
+      ...movie,
+      reviewsCount: movie._count?.reviews ?? 0
+    }));
+
+    sendSuccess(res, moviesWithReviewCount);
   } catch (error) {
     sendError(res, 500, error.message);
   }
@@ -97,7 +103,14 @@ export async function getMovieById(req, res) {
     if (!movie) {
       return sendError(res, 404, `Película ID ${req.params.id} no encontrada`);
     }
-    sendSuccess(res, movie);
+
+    res.json({
+      success: true,
+      data: {
+        ...movie,
+        reviewsCount: movie.reviews?.length ?? 0
+      }
+    });
   } catch (error) {
     sendError(res, 500, error.message);
   }
@@ -141,5 +154,18 @@ export async function createMovie(req, res) {
     res.status(201).json({ success: true, data: newMovie });
   } catch (error) {
     sendError(res, 400, error.message);
+  }
+}
+
+export async function deleteMovie(req, res) {
+  try {
+    await deleteMovieService(req.params.id);
+    res.json({ success: true, message: 'Película eliminada' });
+  } catch (error) {
+    if (error.code === 'P2025') {
+      return sendError(res, 404, `Película ID ${req.params.id} no encontrada`);
+    }
+
+    sendError(res, 500, error.message);
   }
 }

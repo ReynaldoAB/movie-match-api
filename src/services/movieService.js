@@ -34,15 +34,30 @@ export async function getAllMovies(filters = {}) {
 
   return await prisma.movie.findMany({
     where,
+    include: {
+      _count: { select: { reviews: true } }
+    },
     orderBy: { createdAt: 'desc' }
   });
 }
 
 // GET movie by ID
 export async function getMovieById(id) {
-  return await prisma.movie.findUnique({
-    where: { id: parseInt(id) }
+  const movie = await prisma.movie.findUnique({
+    where: { id: parseInt(id) },
+    include: {
+      reviews: {
+        orderBy: { createdAt: 'desc' }
+      }
+    }
   });
+
+  if (movie && movie.reviews.length > 0) {
+    const avgRating = movie.reviews.reduce((sum, review) => sum + review.rating, 0) / movie.reviews.length;
+    movie.avgReviewRating = Math.round(avgRating * 10) / 10;
+  }
+
+  return movie;
 }
 
 // GET movies by minimum rating

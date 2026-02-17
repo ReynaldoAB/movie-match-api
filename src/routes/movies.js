@@ -10,6 +10,7 @@ router.get('/genres', movieController.getGenres);
 router.get('/', movieController.getAllMovies);
 router.get('/:id', movieController.getMovieById);
 router.post('/', movieController.createMovie);
+router.delete('/:id', movieController.deleteMovie);
 
 
 
