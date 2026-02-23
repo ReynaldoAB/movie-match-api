@@ -139,6 +139,163 @@ paths:
                   requested:
                     type: integer
 
+  /movies/search:
+    get:
+      summary: Búsqueda avanzada de películas
+      tags:
+        - Movies
+      parameters:
+        - in: query
+          name: q
+          schema:
+            type: string
+          description: Texto a buscar en el título
+        - in: query
+          name: genre
+          schema:
+            type: string
+            enum: [ACTION, COMEDY, DRAMA, HORROR, SCIFI, THRILLER]
+          description: Filtrar por género
+        - in: query
+          name: yearMin
+          schema:
+            type: integer
+          description: Año mínimo
+        - in: query
+          name: yearMax
+          schema:
+            type: integer
+          description: Año máximo
+        - in: query
+          name: ratingMin
+          schema:
+            type: number
+            format: float
+            minimum: 0
+            maximum: 10
+          description: Rating mínimo (0-10)
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: Página actual
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            default: 10
+          description: Tamaño de página
+      responses:
+        '200':
+          description: Resultados de búsqueda paginados
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Movie'
+                  pagination:
+                    type: object
+                    properties:
+                      page:
+                        type: integer
+                      limit:
+                        type: integer
+                      total:
+                        type: integer
+                      pages:
+                        type: integer
+
+  /stats:
+    get:
+      summary: Obtener estadísticas del dashboard
+      tags:
+        - Stats
+      responses:
+        '200':
+          description: Estadísticas generales de películas y reviews
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      totalMovies:
+                        type: integer
+                      totalReviews:
+                        type: integer
+                      avgRating:
+                        type: number
+                        format: float
+                      moviesByGenre:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            genre:
+                              type: string
+                            count:
+                              type: integer
+                            avgRating:
+                              type: number
+                              format: float
+                      topRated:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                            title:
+                              type: string
+                            rating:
+                              type: number
+                              format: float
+                            genre:
+                              type: string
+                      mostReviewed:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                            title:
+                              type: string
+                            reviewCount:
+                              type: integer
+                      recentReviews:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                            author:
+                              type: string
+                            rating:
+                              type: number
+                              format: float
+                            comment:
+                              type: string
+                            movieTitle:
+                              type: string
+                            createdAt:
+                              type: string
+                              format: date-time
+
   /movies/{id}:
     get:
       summary: Obtener película por ID

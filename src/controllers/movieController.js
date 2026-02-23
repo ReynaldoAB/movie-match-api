@@ -5,7 +5,11 @@ import {
   createMovie as createMovieService,
   deleteMovie as deleteMovieService,
   getRandomMoviesWithAI,
-  getMoviesByMinRating
+  getMoviesByMinRating,
+  searchMovies as searchMoviesService,
+  getMoviesWithoutReviews as getMoviesWithoutReviewsService,
+  getRecentMovies as getRecentMoviesService,
+  exportData as exportDataService
 } from '../services/movieService.js';
 
 import { enrichMoviesWithAI } from '../services/aiService.js';
@@ -169,3 +173,42 @@ export async function deleteMovie(req, res) {
     sendError(res, 500, error.message);
   }
 }
+
+export async function search(req, res) {
+  try {
+    const result = await searchMoviesService(req.query);
+    res.json({ success: true, ...result });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+export async function getWithoutReviews(req, res) {
+  try {
+    const movies = await getMoviesWithoutReviewsService();
+    res.json({ success: true, data: movies, count: movies.length });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+export async function getRecent(req, res) {
+  try {
+    const movies = await getRecentMoviesService();
+    res.json({ success: true, data: movies, count: movies.length });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+export async function getExportData(req, res) {
+  try {
+    const data = await exportDataService();
+    res.json({ success: true, data, count: data.length });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+
+

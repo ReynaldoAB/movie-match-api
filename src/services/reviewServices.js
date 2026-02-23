@@ -46,3 +46,37 @@ export async function getMovieById(id) {
     }
   });
 }
+
+export async function deleteMovieWithReviews(id) {
+  // Aunque tenemos onDelete: Cascade, demostraremos transacciones
+  return await prisma.$transaction(async (tx) => {
+    // 1. Verificar que existe la película
+    const movie = await tx.movie.findUnique({
+      where: { id: parseInt(id) },
+      include: { _count: { select: { reviews: true } } }
+    });
+
+    if (!movie) {
+      throw new Error('Película no encontrada');
+    }
+
+    // 2. Guardar info para el log
+    const reviewCount = movie._count.reviews;
+
+    // 3. Eliminar reviews primero (explícitamente)
+    await tx.review.deleteMany({
+      where: { movieId: parseInt(id) }
+    });
+
+    // 4. Eliminar película
+    await tx.movie.delete({
+      where: { id: parseInt(id) }
+    });
+
+    // 5. Retornar resultado
+    return {
+      deletedMovie: movie.title,
+      deletedReviews: reviewCount
+    };
+  });
+}

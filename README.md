@@ -6,7 +6,10 @@ API REST para gestionar y recomendar películas con **Prisma 7**, **PostgreSQL**
 
 - ✅ CRUD completo de películas con Prisma ORM
 - ✅ Filtrado por rating mínimo
+- ✅ Búsqueda avanzada de películas con paginación
 - ✅ Descubrimiento inteligente con IA
+- ✅ Endpoints de analytics (`/stats`)
+- ✅ Endpoints utilitarios (`/movies/recent`, `/movies/without-reviews`, `/movies/export`)
 - ✅ Base de datos PostgreSQL (Neon)
 - ✅ Documentación interactiva con Swagger UI
 - ✅ Arquitectura modular y escalable
@@ -90,12 +93,19 @@ movie-match-api/
 │   ├── lib/
 │   │   └── prisma.js          # Cliente de Prisma con adapter
 │   ├── services/
-│   │   ├── movieService.js    # Lógica de negocio
-│   │   └── aiService.js       # Integración con OpenRouter
+│   │   ├── movieService.js    # Lógica de negocio de películas
+│   │   ├── reviewServices.js  # Lógica de reviews
+│   │   ├── statsService.js    # Lógica de estadísticas dashboard
+│   │   ├── aiService.js       # Integración con OpenRouter
+│   │   └── ...
 │   ├── controllers/
-│   │   └── movieController.js # Controladores de rutas
+│   │   ├── movieController.js # Controladores de películas
+│   │   ├── reviewController.js
+│   │   └── statsController.js
 │   ├── routes/
-│   │   └── movies.js          # Definición de rutas
+│   │   ├── movies.js          # Rutas de películas
+│   │   ├── reviewRoutes.js    # Rutas de reviews
+│   │   └── statsRoutes.js     # Ruta /stats
 │   ├── middlewares/
 │   │   ├── logger.js          # Log de requests
 │   │   ├── errorHandler.js    # Manejo de errores
@@ -124,7 +134,11 @@ Información de bienvenida y endpoints disponibles.
   "message": "Bienvenido a Movie Match API 🎬",
   "endpoints": {
     "movies": "/movies",
-    "docs": "/docs"
+    "moviesSearch": "/movies/search",
+    "reviews": "/reviews",
+    "stats": "/stats",
+    "docs": "/docs",
+    "health": "/health"
   }
 }
 ```
@@ -314,6 +328,64 @@ curl "http://localhost:3000/movies/discover?count=5"
 }
 ```
 
+#### Búsqueda avanzada con paginación 🔎
+```http
+GET /movies/search?q=inception&genre=SCIFI&yearMin=2000&yearMax=2020&ratingMin=8&page=1&limit=10
+```
+
+**Query Parameters opcionales:**
+- `q` (texto en título, case-insensitive)
+- `genre` (enum de géneros)
+- `yearMin`, `yearMax` (rango de años)
+- `ratingMin` (rating mínimo)
+- `page` (default `1`)
+- `limit` (default `10`)
+
+**Respuesta:**
+```json
+{
+  "success": true,
+  "data": [],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "total": 0,
+    "pages": 0
+  }
+}
+```
+
+#### Películas sin reviews
+```http
+GET /movies/without-reviews
+```
+
+#### Películas recientes (últimos 7 días)
+```http
+GET /movies/recent
+```
+
+#### Exportar data de películas
+```http
+GET /movies/export
+```
+
+### 📊 Estadísticas
+
+#### Dashboard stats
+```http
+GET /stats
+```
+
+Incluye, entre otros:
+- `totalMovies`
+- `totalReviews`
+- `avgRating`
+- `moviesByGenre`
+- `topRated`
+- `mostReviewed`
+- `recentReviews`
+
 #### Crear nueva película
 ```http
 POST /movies
@@ -462,6 +534,18 @@ curl http://localhost:3000/movies/1
 
 # Health check
 curl http://localhost:3000/health
+
+# Búsqueda avanzada
+curl "http://localhost:3000/movies/search?q=matrix&ratingMin=8&page=1&limit=5"
+
+# Películas recientes
+curl http://localhost:3000/movies/recent
+
+# Películas sin reviews
+curl http://localhost:3000/movies/without-reviews
+
+# Dashboard stats
+curl http://localhost:3000/stats
 ```
 
 ### JavaScript (Fetch API)

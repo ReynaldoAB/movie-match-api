@@ -32,3 +32,16 @@ export async function remove(req, res) {
     res.status(500).json({ success: false, error: error.message });
   }
 }
+
+export async function removeMovieWithReviews(req, res) {
+  try {
+    const { movieId } = req.params;
+    const result = await reviewService.deleteMovieWithReviews(movieId);
+    res.json({ success: true, data: result });
+  } catch (error) {
+    if (error.message === 'Película no encontrada') {
+      return res.status(404).json({ success: false, error: error.message });
+    }
+    res.status(500).json({ success: false, error: error.message });
+  }
+}

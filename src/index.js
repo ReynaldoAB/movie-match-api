@@ -12,6 +12,8 @@ import { logger } from './middlewares/logger.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { notFound } from './middlewares/notFound.js';
 
+import statsRoutes from './routes/statsRoutes.js';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -20,6 +22,8 @@ const swaggerDoc = YAML.load(join(__dirname, 'docs', 'swagger.yaml'));
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+app.use(statsRoutes);
 
 // Swagger UI
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
@@ -35,7 +39,10 @@ app.get('/', (req, res) => {
     message: 'Bienvenido a Movie Match API 🎬',
     endpoints: {
       movies: '/movies',
+      // Endpoints agregados recientemente de búsqueda y reviews
+      moviesSearch: '/movies/search',
       reviews: '/reviews',
+      stats: '/stats',
       docs: '/docs',
       health: '/health'
     }
